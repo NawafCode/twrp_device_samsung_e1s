@@ -53,6 +53,10 @@ TARGET_USERIMAGES_USE_EROFS := true
 # Workaround for error copying vendor files to recovery ramdisk
 TARGET_COPY_OUT_VENDOR := vendor
 TARGET_COPY_OUT_PRODUCT := product
+BOARD_SYSTEMIMAGE_FILE_SYSTEM_TYPE := erofs
+BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := erofs
+BOARD_PRODUCTIMAGE_FILE_SYSTEM_TYPE := erofs
+BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := erofs
 
 # Recovery
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
@@ -79,4 +83,4 @@ BOARD_AVB_ENABLE := true
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
 
 # Touch modules
-TW_LOAD_VENDOR_MODULES := $(shell ls $(LOCAL_PATH)/recovery/root/vendor/lib/modules/*.ko)
+TW_LOAD_VENDOR_MODULES := $(shell ls device/samsung/e1s/recovery/root/vendor/lib/modules/*.ko | xargs -n 1 basename)
