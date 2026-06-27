@@ -87,5 +87,3 @@ BOARD_AVB_RECOVERY_ALGORITHM := SHA256_RSA4096
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
 
-# Touch modules
-TW_LOAD_VENDOR_MODULES := $(shell ls device/samsung/e1s/recovery/root/vendor/lib/modules/*.ko | xargs -n 1 basename)
