@@ -1,0 +1,59 @@
+name: Build TWRP
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build TWRP for Samsung S24
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout the device tree
+        uses: actions/checkout@v4
+        with:
+          path: device/samsung/e1s
+
+      - name: Setup Build Environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git git-lfs gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev libelf-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev
+          
+      - name: Setup Repo
+        run: |
+          mkdir -p ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+          echo "PATH=~/bin:$PATH" >> $GITHUB_ENV
+          
+      - name: Initialize TWRP Workspace
+        run: |
+          mkdir workspace
+          cd workspace
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          ~/bin/repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1 --depth=1
+          ~/bin/repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+          
+      - name: Move Device Tree
+        run: |
+          mv device workspace/
+          
+      - name: Build TWRP
+        run: |
+          cd workspace
+          source build/envsetup.sh
+          lunch omni_e1s-userdebug
+          export ALLOW_MISSING_DEPENDENCIES=true
+          mka recoveryimage
+          
+      - name: Upload Recovery Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: TWRP-Recovery-S24
+          path: workspace/out/target/product/e1s/recovery.img
