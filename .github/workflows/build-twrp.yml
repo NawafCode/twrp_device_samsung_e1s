@@ -42,7 +42,8 @@ jobs:
           
       - name: Move Device Tree
         run: |
-          mv device workspace/
+          mkdir -p workspace/device/samsung
+          cp -r device/samsung/e1s workspace/device/samsung/
           
       - name: Build TWRP
         run: |
